@@ -1,0 +1,82 @@
+{% extends "@Secret/SecretView/bootstrap.html.twig" %}
+
+{#
+  Source: http://dev.dbl-a.com/symfony-2-0/symfony2-and-twig-pagination/
+  Updated by: Simon Schick <simonsimcity@gmail.com>
+  Parameters:
+    * currentFilters (array) : associative array that contains the current route-arguments
+    * currentPage (int) : the current page you are in
+    * paginationPath (string) : the route name to use for links
+    * showAlwaysFirstAndLast (bool) : Always show first and last link (just disabled)
+    * maxPages (int) : represents the total number of existing pages
+#}
+
+{% block body %}
+    {% if maxPages > 1 %}
+
+        {# the number of first and last pages to be displayed #}
+        {% set extremePagesLimit = 3 %}
+
+        {# the number of pages that are displayed around the active page #}
+        {% set nearbyPagesLimit = 3 %}
+
+        {% set pathRoute = 'presenceCheck'%}
+        {% set showAlwaysFirstAndLast = true %}
+
+        <ul class="pagination">
+            {% if page > 1 %}
+                <li>
+                    <a href="{{ path(pathRoute, {page: page-1}) }}">Previous</a>
+                </li>
+                {% for i in range(1, extremePagesLimit) if ( i < page - nearbyPagesLimit ) %}
+                <li>
+                    <a href="{{ path(pathRoute, {page: i}) }}">{{ i }}</a>
+                </li>
+                {% endfor %}
+
+                {% if extremePagesLimit + 1 < page - nearbyPagesLimit %}
+                <li>
+                    <span class="sep-dots">...</span>
+                </li>
+                {% endif %}
+                {% for i in range(page-nearbyPagesLimit, page-1) if ( i > 0 ) %}
+                <li>
+                    <a href="{{ path(pathRoute, {page: i}) }}">{{ i }}</a>
+                </li>
+                {% endfor %}
+            {% elseif showAlwaysFirstAndLast %}
+                <li>
+                    <span class="disabled">Previous</span>
+                </li>
+            {% endif %}
+            <li>
+                <a href="{{ path(pathRoute, { page: page }) }}" class="active">{{ page }}</a>
+            </li>
+            {% if page < maxPages %}
+                {% for i in range(page+1, page + nearbyPagesLimit) if ( i <= maxPages ) %}
+                    <li>
+                        <a href="{{ path(pathRoute, {page: i}) }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+                {% if  (maxPages - extremePagesLimit) > (page + nearbyPagesLimit) %}
+                    <li>
+                        <span class="sep-dots">...</span>
+                    </li>
+                {% endif %}
+
+                {% for i in range(maxPages - extremePagesLimit+1, maxPages) if ( i > page + nearbyPagesLimit ) %}
+                    <li>
+                        <a href="{{ path(pathRoute, {page: i}) }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+                <li>
+                    <a href="{{ path(pathRoute, {page: page+1}) }}">Next</a>
+                </li>
+            {% elseif showAlwaysFirstAndLast %}
+                <li>
+                    <span class="disabled">Next</span>
+                </li>
+            {% endif %}
+        </ul>
+    {% endif %}
+{% endblock %}

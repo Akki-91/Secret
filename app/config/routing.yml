@@ -1,0 +1,5 @@
+secret:
+    resource: "@SecretBundle/Controller/"
+    type:     annotation
+    prefix:   /
+

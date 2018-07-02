@@ -1,0 +1,30 @@
+{% extends "@Secret/SecretView/bootstrap.html.twig" %}
+
+{% block body %}
+    <div id='tableDiv'>
+        <table class='table table-hover'>
+            <thead>
+            <tr>
+                <th class='row'>Lp</th>
+                <th class='row'>Imie i nazwisko</th>
+                <th class='row'>Data obecności</th>
+                <th class='row'>Karnet opłacy do </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in rows %}
+                <tr class='{{ row.class }}'>
+                    <td class='row '>{{ row.lp }}</td>
+                    <td class='row'>{{ row.name }}</td>
+                    <td class='row'>{{ row.presenceDate }}</td>
+                    <td class='row'>{{ row.paymentDate }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div style='text-align: center'>
+            {% include "@Secret/SecretView/paginationControl.html.twig"%}
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "@Secret/SecretView/bootstrap.html.twig" %}
+
+{% block body %}
+    {{ form_start(form) }}
+    <div>
+        {{ form_label(form.clubCardNumber) }}
+        {{ form_widget(form.clubCardNumber) }}
+    </div>
+    <div>
+        <button name='checkPresence' type='submit' value='checkPresence' class='btn btn-default'>Zalicz obecność</button>
+        <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
+    </div>
+    <br>
+    <div>
+        {% for msg in app.session.flashBag.get('userChecked') %}
+            <div class="alert alert-success">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    </div>
+    <div>
+        {% for msg in app.session.flashBag.get('noEntriesLeft') %}
+            <div class="alert alert-warning">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if rows is defined %}
+      {% include "@Secret/SecretView/presentUsersTable.html.twig"%}
+    {% endif %}
+
+    {{ form_end(form) }}
+{% endblock %}

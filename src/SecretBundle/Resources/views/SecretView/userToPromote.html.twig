@@ -1,0 +1,12 @@
+{% extends "@Secret/SecretView/bootstrap.html.twig" %}
+
+{% block body %}
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div>
+        <button name='userToPromote' type='submit' value='userToPromote' class='btn btn-default'>Wybierz użytkownika do promocji na pas</button>
+        <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "@Secret/SecretView/bootstrap.html.twig" %}
+
+{% block body %}
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div>
+        <button name='create' type='submit' value='create' class='btn btn-default'>Zaktualizuj dane użytkownika</button>
+        <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

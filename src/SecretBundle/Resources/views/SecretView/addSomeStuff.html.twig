@@ -1,0 +1,12 @@
+{% extends "@Secret/SecretView/bootstrap.html.twig" %}
+
+{% block body %}
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+    <div>
+        <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
+    </div>
+
+{% endblock %}

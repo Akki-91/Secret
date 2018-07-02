@@ -1,0 +1,4 @@
+services:
+#    secret.example:
+#        class: SecretBundle\Example
+#        arguments: ["@service_id", "plain_value", "%parameter%"]

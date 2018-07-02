@@ -1,0 +1,13 @@
+{% extends "@Secret/SecretView/bootstrap.html.twig" %}
+
+{% block body %}
+    <div>
+        <p>
+            Aplikacja ma cel sprawdzać obecność podczas zajęć BJJ oraz prowadzić statystyki aktywności zawodników.
+        </p>
+        <a href="{{ path('addUserForm') }}" class="btn btn-default">Dodaj użytkownika</a>
+        {#<a href="{{ path('showAllUsers') }}" class="btn btn-default">Edytuj użytkownika</a>#}
+        <a href="{{ path('presenceCheck') }}" class="btn btn-default">Obecność</a>
+        {#<a href="{{ path('userToPromote') }}" class="btn btn-default">Promocja na pas</a>#}
+    </div>
+{% endblock %}
