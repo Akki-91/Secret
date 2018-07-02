@@ -104,24 +104,13 @@ class MainController extends Controller
 
         $form->handleRequest($req);
         if ($form->isSubmitted()){
-            if($form->getErrors()){
-                foreach ($form->getErrors() as $key => $error) {
-                    $template = $error->getMessageTemplate();
-                    $parameters = $error->getMessageParameters();
-
-                    var_dump($template);
-                    var_dump($parameters);
-                }
-            } elseif($req->request->get('create') && $form->isValid()){
+            if($req->request->get('create') && $form->isValid()){
 
                 $file = $userInfo->getPicturePath();
-                var_dump($file);
+//                var_dump($file);
 
                 $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
-                var_dump($fileName);
-                die();
-
-//                return 'hello kitty';
+//                var_dump($fileName);
 
                 $userInfo->setTotalTrainingCount(0);
                 $userExp->setPromotionDate($date);
@@ -147,6 +136,15 @@ class MainController extends Controller
                 $this->em->persist($userExp);
                 $this->em->flush();
                 return $this->redirectToRoute('welcomePage');
+            } else {
+                foreach ($form->getErrors() as $key => $error) {
+                    $template = $error->getMessageTemplate();
+                    $parameters = $error->getMessageParameters();
+
+                    var_dump($template);
+                    var_dump($parameters);
+                     return new Response ("$template");
+                }
             }
         }
     }
