@@ -111,6 +111,9 @@ class MainController extends Controller
 
                 $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
 //                var_dump($fileName);
+                $directory = $this->container->getParameter('kernel.root_dir') . '/../web/usersPictures';
+                $file->move($directory ,$fileName);
+                $file = $userInfo->setPicturePath($fileName);
 
                 $userInfo->setTotalTrainingCount(0);
                 $userExp->setPromotionDate($date);
