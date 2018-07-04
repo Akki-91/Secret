@@ -1,10 +1,10 @@
 {% extends "@Secret/SecretView/bootstrap.html.twig" %}
 
 {% block body %}
+    {#<a href="{{ asset('usersPictures/' ~ photo) }}">View user photo</a>#}
+    <img src="{{ asset('usersPictures/' ~ photo) }}" alt="alt" width="300px" height="300px" />
 
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
-    {{ form_end(form) }}
+
     <div>
         <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
     </div>

@@ -1,6 +1,7 @@
 {% extends "@Secret/SecretView/bootstrap.html.twig" %}
 
 {% block body %}
+    <script src="{{ asset('js/addUserForm.js')}}"></script>
     {{ form_start(form) }}
     <div>
         {{ form_label(form.name) }}
@@ -28,7 +29,7 @@
         {{ form_widget(form.userExperienceRelation) }}
     </div>
     <div>
-        <button name='create' type='submit' value='create' class='btn btn-default'>Zarejestruj użytkownika</button>
+        <button id='addUserFormSubmit' name='create' type='submit' value='create' class='btn btn-default'>Zarejestruj użytkownika</button>
         <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
     </div>
 

@@ -212,20 +212,13 @@ class UserPresenceController extends Controller
      */
     public function addSomeStuffAction(Request $request)
     {
-        $task = new Task();
-        $tag = new Tag();
+        $repo = $this->em->getRepository(UserInfo::class);
+        $user = $repo->find(106);
 
-        $task->getTags()->add($tag);
-
-        $form = $this->createForm(TaskType::class, $task);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            var_dump("TAKIE CHUJA");
-        }
+        $photo = $user->getPicturePath();
 
         return [
-            'form' => $form->createView()
+            'photo' => $photo,
         ];
     }
 }

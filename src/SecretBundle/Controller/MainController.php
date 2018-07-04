@@ -104,17 +104,15 @@ class MainController extends Controller
 
         $form->handleRequest($req);
         if ($form->isSubmitted()){
+            var_dump('isSubmitted');
             if($req->request->get('create') && $form->isValid()){
-
+            var_dump('is valid');
                 $file = $userInfo->getPicturePath();
-//                var_dump($file);
-
                 $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
-//                var_dump($fileName);
                 $directory = $this->container->getParameter('kernel.root_dir') . '/../web/usersPictures';
                 $file->move($directory ,$fileName);
-                $file = $userInfo->setPicturePath($fileName);
 
+                $userInfo->setPicturePath($fileName);
                 $userInfo->setTotalTrainingCount(0);
                 $userExp->setPromotionDate($date);
                 $userExp->setTrainingsCountOnPromotionDay(0);
@@ -140,14 +138,20 @@ class MainController extends Controller
                 $this->em->flush();
                 return $this->redirectToRoute('welcomePage');
             } else {
-                foreach ($form->getErrors() as $key => $error) {
+                $message = [];
+                foreach ($form->getErrors(true) as $key => $error) {
+
+//                    var_dump($error);
+
                     $template = $error->getMessageTemplate();
                     $parameters = $error->getMessageParameters();
 
-                    var_dump($template);
-                    var_dump($parameters);
-                     return new Response ("$template");
+                    $message[] = ['key' => $key, 'msg' => $error->getMessage()];
+
                 }
+                var_dump($message);
+
+                return new Response ("");
             }
         }
     }

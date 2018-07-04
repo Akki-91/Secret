@@ -26,6 +26,11 @@ class UserInfo
 
     /**
      * @var int
+     * @Assert\Length(
+     *     min=6,
+     *     max=6,
+     *     exactMessage = "Numer karty musi składać się z {{ limit }} cyfr",
+     * )
      *
      * @ORM\Column(name="clubCardNumber", type="integer")
      */
@@ -68,11 +73,13 @@ class UserInfo
 
     /**
      * @ORM\OneToMany(targetEntity="UserPresence", mappedBy="presence")
+     * @Assert\Valid()
      */
     private $userPresenceRelation;
 
     /**
      * @ORM\OneToMany(targetEntity="UserExperience", mappedBy="experience")
+     * @Assert\Valid()
      */
     private $userExperienceRelation;
 

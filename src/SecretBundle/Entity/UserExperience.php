@@ -3,6 +3,7 @@
 namespace SecretBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * UserExperience
@@ -23,14 +24,12 @@ class UserExperience
 
     /**
      * @var int
-     *
      * @ORM\Column(name="belt", type="integer")
      */
     private $belt;
 
     /**
      * @var int
-     *
      * @ORM\Column(name="stripes", type="integer")
      */
     private $stripes;
