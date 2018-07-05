@@ -104,9 +104,9 @@ class MainController extends Controller
 
         $form->handleRequest($req);
         if ($form->isSubmitted()){
-            var_dump('isSubmitted');
+//            var_dump('isSubmitted');
             if($req->request->get('create') && $form->isValid()){
-            var_dump('is valid');
+//            var_dump('is valid');
                 $file = $userInfo->getPicturePath();
                 $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
                 $directory = $this->container->getParameter('kernel.root_dir') . '/../web/usersPictures';
@@ -138,20 +138,19 @@ class MainController extends Controller
                 $this->em->flush();
                 return $this->redirectToRoute('welcomePage');
             } else {
-                $message = [];
+                $errorMessages = [];
                 foreach ($form->getErrors(true) as $key => $error) {
-
-//                    var_dump($error);
-
                     $template = $error->getMessageTemplate();
                     $parameters = $error->getMessageParameters();
 
-                    $message[] = ['key' => $key, 'msg' => $error->getMessage()];
-
+                    $errorMessages[] = ['key' => $key, 'msg' => $error->getMessage()];
                 }
-                var_dump($message);
 
-                return new Response ("");
+                if(count($errorMessages) > 0){
+                    $this->addFlash('errorMessages', $errorMessages );
+                }
+
+                return $this->redirectToRoute('addUserForm');
             }
         }
     }

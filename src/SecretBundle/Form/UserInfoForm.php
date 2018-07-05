@@ -38,7 +38,7 @@ class UserInfoForm extends AbstractType
                 'required' => true,
                 'label' => 'Numer karty klubowej:',
                 'attr' => [
-                    'placeholder' => '6 cyfr',
+                    'placeholder' => 'Numer składa się z 6 cyfr',
                 ]
             ])
             ->add('paymentAmmount', ChoiceType::class, [

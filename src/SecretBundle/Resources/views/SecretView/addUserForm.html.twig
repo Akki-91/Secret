@@ -33,6 +33,16 @@
         <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
     </div>
 
+    <div>
+        {% for error in app.session.flashBag.get('errorMessages')%}
+            {% for errorMessage in error %}
+                <div class="alert alert-warning">
+                    {{ errorMessage.msg }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
     {{ form_end(form) }}
 
 {% endblock %}
