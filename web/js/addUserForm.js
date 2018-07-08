@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-
     function checkCardNumber()
     {
         var clubCardVal = $('#user_info_form_clubCardNumber').val();
@@ -35,6 +34,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function imagePreview(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#userImage').attr('src', e.target.result)
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     $("#addUserFormSubmit").on("click", function () {
         var cardNumberValidation = checkCardNumber();
         var imageSizeValidation = validateFileSize();
@@ -52,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $('#user_info_form_picturePath').bind('change', function() {
         // w zależności czy ma sprawdza wage pliku na uploadzie czy submit?
+        imagePreview(this);
     });
 
 });

@@ -32,6 +32,9 @@
         <button id='addUserFormSubmit' name='create' type='submit' value='create' class='btn btn-default'>Zarejestruj użytkownika</button>
         <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
     </div>
+    <div>
+        <img style="width:200px; height:200px" id="userImage" src="{{ asset('img/defaultUserImage.png') }}"/>
+    </div>
 
     <div>
         {% for error in app.session.flashBag.get('errorMessages')%}
