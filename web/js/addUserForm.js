@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var clubCardVal = $('#user_info_form_clubCardNumber').val();
         var verifyNumber = isNaN(clubCardVal);
         var clubCardValInt = parseInt(clubCardVal);
-        var clubCardLength =   clubCardVal.length;
+        var clubCardLength = clubCardVal.length;
 
         if(verifyNumber === false){
             if(clubCardLength !== 6){
@@ -46,24 +46,56 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    $("#addUserFormSubmit").on("click", function () {
+    $('#user_info_form_name').on('change', function() {
+        var nameNotEmpty = $('#user_info_form_name').val().length;
+        $("#nameError").remove();
+
+        if(nameNotEmpty === 0){
+            $("#errorDiv").append("<div id='nameError' class=\"alert alert-warning\"><p>Proszę wprowadzić imię i nazwisko</p></div>");
+        }
+    });
+
+    $('#user_info_form_clubCardNumber').on('change', function() {
         var cardNumberValidation = checkCardNumber();
-        var imageSizeValidation = validateFileSize();
+        $("#clubCardNumberError").remove();
 
         if(cardNumberValidation !== true){
-            console.log(cardNumberValidation)
+            $("#errorDiv").append("<div id='clubCardNumberError' class=\"alert alert-warning\"><p>" + cardNumberValidation + " </p></div>");
         }
-
-        if(imageSizeValidation !== true){
-            console.log(imageSizeValidation)
-        }
-
-        return false;
     });
 
-    $('#user_info_form_picturePath').bind('change', function() {
-        // w zależności czy ma sprawdza wage pliku na uploadzie czy submit?
+    $('#user_info_form_picturePath').on('change', function() {
+        var fileSize = validateFileSize();
+        $("#picturePathError").remove();
+
+        if(fileSize !== true){
+            $("#errorDiv").append("<div id='picturePathError' class=\"alert alert-warning\"><p>Plik jest zbyt duży. Limit wynosi 8 MB.</p></div>");
+            $('#user_info_form_picturePath').val("");
+            $('#userImage').attr('src', 'img/defaultUserImage.png');
+            return false;
+        }
+
         imagePreview(this);
     });
+
+    /*
+    Chwilowo rezygnuje z weryfikacji na submit, na rzecz weryfikacji każdego pola jednorazowo na on.('change').
+     */
+    // $("#addUserFormSubmit").on("click", function () {
+    //     var cardNumberValidation = checkCardNumber();
+    //     var imageSizeValidation = validateFileSize();
+    //
+    //     if(cardNumberValidation !== true){
+    //         $("#clubCardNumberError").remove();
+    //         $("#errorDiv").append("<div id='clubCardNumberError' class=\"alert alert-warning\"><p>" + cardNumberValidation + " </p></div>");
+    //     }
+    //
+    //     if(imageSizeValidation !== true){
+    //         $("#picturePathError").remove();
+    //         $("#errorDiv").append("<div id='picturePathError' class=\"alert alert-warning\"><p> " + imageSizeValidation + " </p></div>");
+    //     }
+    //
+    //     return false;
+    // });
 
 });

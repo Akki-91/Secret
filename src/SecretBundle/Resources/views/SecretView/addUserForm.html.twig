@@ -36,7 +36,7 @@
         <img style="width:200px; height:200px" id="userImage" src="{{ asset('img/defaultUserImage.png') }}"/>
     </div>
 
-    <div>
+    <div id="errorDiv">
         {% for error in app.session.flashBag.get('errorMessages')%}
             {% for errorMessage in error %}
                 <div class="alert alert-warning">

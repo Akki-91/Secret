@@ -104,9 +104,7 @@ class MainController extends Controller
 
         $form->handleRequest($req);
         if ($form->isSubmitted()){
-//            var_dump('isSubmitted');
             if($req->request->get('create') && $form->isValid()){
-//            var_dump('is valid');
                 $file = $userInfo->getPicturePath();
                 $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
                 $directory = $this->container->getParameter('kernel.root_dir') . '/../web/usersPictures';
@@ -140,9 +138,6 @@ class MainController extends Controller
             } else {
                 $errorMessages = [];
                 foreach ($form->getErrors(true) as $key => $error) {
-                    $template = $error->getMessageTemplate();
-                    $parameters = $error->getMessageParameters();
-
                     $errorMessages[] = ['key' => $key, 'msg' => $error->getMessage()];
                 }
 
