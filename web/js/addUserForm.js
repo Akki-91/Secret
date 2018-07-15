@@ -46,6 +46,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function isClubCardUnique(clubCardNumber)
+    {
+        $.ajax({
+            url: '/checkClubCardNumber',
+            data: {
+                'clubCardNumber': clubCardNumber
+            },
+            type: 'GET',
+            dataType: 'json'
+        }).done( function (ans) {
+            $("#clubCardNumberDuplicateError").remove();
+            if(ans.cardNumberExists === true){
+                $("#errorDiv").append("<div id='clubCardNumberDuplicateError' class=\"alert alert-warning\"><p>Wskazany numer karty już istnieje. Proszę wprowadzić inny.</p></div>");
+            }
+        });
+    }
+
     $('#user_info_form_name').on('change', function() {
         var nameNotEmpty = $('#user_info_form_name').val().length;
         $("#nameError").remove();
@@ -57,10 +74,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $('#user_info_form_clubCardNumber').on('change', function() {
         var cardNumberValidation = checkCardNumber();
+        var clubCardNumber = $('#user_info_form_clubCardNumber').val();
         $("#clubCardNumberError").remove();
 
         if(cardNumberValidation !== true){
             $("#errorDiv").append("<div id='clubCardNumberError' class=\"alert alert-warning\"><p>" + cardNumberValidation + " </p></div>");
+        } else {
+            isClubCardUnique(clubCardNumber);
         }
     });
 
@@ -79,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     /*
-    Chwilowo rezygnuje z weryfikacji na submit, na rzecz weryfikacji każdego pola jednorazowo na on.('change').
+    Chwilowo rezygnuje z weryfikacji na submit, na rzecz poszczególnych pól na on.('change').
      */
     // $("#addUserFormSubmit").on("click", function () {
     //     var cardNumberValidation = checkCardNumber();

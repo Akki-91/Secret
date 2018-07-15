@@ -6,12 +6,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * UserInfo
  *
  * @ORM\Table(name="user_info")
  * @ORM\Entity(repositoryClass="SecretBundle\Repository\UserInfoRepository")
+ * @UniqueEntity(
+ *     "clubCardNumber",
+ *      message="Numer karty już istnieje w systemie."
+ * )
  */
 class UserInfo
 {
@@ -32,7 +37,7 @@ class UserInfo
      *     exactMessage = "Numer karty musi składać się z {{ limit }} cyfr",
      * )
      *
-     * @ORM\Column(name="clubCardNumber", type="integer")
+     * @ORM\Column(name="clubCardNumber", type="integer", unique=true)
      */
     private $clubCardNumber;
 

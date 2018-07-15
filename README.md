@@ -1,4 +1,7 @@
 Secret
 ======
 
-A Symfony project created on June 24, 2018, 10:59 am.
+The project is supposed to help manage club fighters presence and their experience.
+For now it only consider brazilian jiu jitsu trainings, however there are plans to monitor other activities.
+
+Gracie Barra Draculino Team!
