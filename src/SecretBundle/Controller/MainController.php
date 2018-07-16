@@ -88,13 +88,13 @@ class MainController extends Controller
         if ($request->isXmlHttpRequest()) {
             $clubCardNumber = $request->query->get('clubCardNumber');
             $repo = $this->em->getRepository(UserInfo::class);
-            $cardNumberExists = $repo->findByClubCardNumber($clubCardNumber);
+            $cardNumberExists = $repo->findOneByClubCardNumber($clubCardNumber);
 
-            if (empty($cardNumberExists) === true) {
-                return new JsonResponse(array('cardNumberExists' => false));
-            } else {
+            if($cardNumberExists instanceof UserInfo){
                 return new JsonResponse(array('cardNumberExists' => true));
             }
+
+            return new JsonResponse(array('cardNumberExists' => false));
         }
     }
 
