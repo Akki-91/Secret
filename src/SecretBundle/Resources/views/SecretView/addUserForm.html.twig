@@ -35,7 +35,13 @@
     <div>
         <img style="width:200px; height:200px" id="userImage" src="{{ asset('img/defaultUserImage.png') }}"/>
     </div>
-
+    <div>
+        {% for msg in app.session.flashBag.get('userAdded') %}
+            <div class="alert alert-success">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    </div>
     <div id="errorDiv">
         {% for error in app.session.flashBag.get('errorMessages')%}
             {% for errorMessage in error %}

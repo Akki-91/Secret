@@ -31,7 +31,7 @@ class UserInfoForm extends AbstractType
                 'label' => 'Imię i nazwisko:',
             ])
             ->add('picturePath', FileType::class, [
-                'required' => true,
+                'required' => false,
                 'label' => 'Zdjęcie:',
             ])
             ->add('clubCardNumber', TextType::class, [

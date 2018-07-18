@@ -1,6 +1,7 @@
 {% extends "@Secret/SecretView/bootstrap.html.twig" %}
 
 {% block body %}
+    {{ dump() }}
     {{ form_start(form) }}
     <div>
         {{ form_label(form.name) }}
@@ -10,7 +11,6 @@
         {{ form_label(form.clubCardNumber) }}
         {{ form_widget(form.clubCardNumber) }}
     </div>
-
     <div>
         {{ form_label(form.paymentAmmount) }}
         {{ form_widget(form.paymentAmmount) }}
@@ -20,10 +20,18 @@
         {{ form_widget(form.paymentDate) }}
     </div>
     <div>
+        {{ form_label(form.picturePath) }}
+        {{ form_widget(form.picturePath) }}
+    </div>
+    <img src="{{ asset('usersPictures/' ~ userPicturePath) }}" alt="alt" width="400px" height="400px" />
+    <div>
+        {#{{ form_widget(form.userExperienceRelation) }}#}
+    </div>
+    <div>
+
         <button name='update' type='submit' value='update' class='btn btn-default'>Zaktualizuj dane użytkownika</button>
         <a href="{{ path('showAllUsers') }}" class="btn btn-default">Wróć do wyboru użytkownika</a>
         <a href="{{ path('welcomePage') }}" class="btn btn-default">Wróć do strony głównej</a>
     </div>
-
     {{ form_end(form) }}
 {% endblock %}

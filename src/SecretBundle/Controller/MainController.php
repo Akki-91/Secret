@@ -16,6 +16,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\File\File;
 
 use SecretBundle\Service\ClubCardNumberUniquenessService;
 
@@ -65,6 +66,28 @@ class MainController extends Controller
     {
         return md5(uniqid());
     }
+
+    /**
+     * @return integer
+     */
+    private function countEntries($paymentAmmount)
+    {
+        switch($paymentAmmount){
+            case 0:
+                return 4;
+                break;
+            case 1:
+                return 8;
+                break;
+            case 2:
+                return 12;
+                break;
+            default:
+                return 0;
+        }
+    }
+
+
 
     /**
      * @Route("/", name="welcomePage")
@@ -143,29 +166,19 @@ class MainController extends Controller
 
                 $userInfo->setPicturePath($fileName);
                 $userInfo->setTotalTrainingCount(0);
+                $userInfo->setEntriesLeft($this->countEntries($userInfo->getPaymentAmmount()));
+
                 $userExp->setPromotionDate($date);
                 $userExp->setTrainingsCountOnPromotionDay(0);
-
-                switch($userInfo->getPaymentAmmount()){
-                    case 0:
-                        $userInfo->setEntriesLeft(4);
-                        break;
-                    case 1:
-                        $userInfo->setEntriesLeft(8);
-                        break;
-                    case 2:
-                        $userInfo->setEntriesLeft(12);
-                        break;
-                    default:
-                        $userInfo->setEntriesLeft(0);
-                }
-
                 $userExp->setExperience($userInfo);
 
                 $this->em->persist($userInfo);
                 $this->em->persist($userExp);
                 $this->em->flush();
-                return $this->redirectToRoute('welcomePage');
+
+                $this->addFlash('userAdded', "Użytkownik " . $userInfo->getName(). " został pomyślnie zarejestrowany." );
+                return $this->redirectToRoute('addUserForm');
+
             } else {
                 $errorMessages = [];
                 foreach ($form->getErrors(true) as $key => $error) {
@@ -190,13 +203,20 @@ class MainController extends Controller
     {
         $repo = $this->em->getRepository(UserInfo::class);
         $userInfo = $repo->find($id);
+        $userExp = $this->userExperience;
+        $picturePreviewPath = $userInfo->getPicturePath();
+
+        $userPicturePath = $this->getParameter('kernel.root_dir').'/../web/usersPictures/'.$userInfo->getPicturePath();
+        $userInfo->setPicturePath(new File($userPicturePath));
+        $userInfo->getUserExperienceRelation()->add($userExp);
 
         $form = $this->createForm(UserInfoForm::class, $userInfo,[
-            'action' => $this->generateUrl('saveEditedUser',['id' => $id]),
+            'action' => $this->generateUrl('saveEditedUser',['id' => $id, 'picturePath' => $picturePreviewPath]),
             'mappingOn' => false,
         ]);
 
         return [
+            'userPicturePath' => $picturePreviewPath,
             'form' => $form->createView()
         ];
     }
@@ -207,15 +227,23 @@ class MainController extends Controller
      */
     public function saveEditedUserAction(Request $req, int $id)
     {
+        //Trzeba wziac pod uwage, ze moze chciec zmienic zdjecie, wiec tylko gdy jest puste zostawić stare.
         $repo = $this->em->getRepository(UserInfo::class);
         $userInfo = $repo->find($id);
+        $picturePath = $req->query->get('picturePath');
+
+        $userPicturePath = $this->getParameter('kernel.root_dir').'/../web/usersPictures/'. $picturePath;
+        $userInfo->setPicturePath(new File($userPicturePath));
 
         $form = $this->createForm(UserInfoForm::class, $userInfo);
 
         $form->handleRequest($req);
 
+        $data = $form->getData();
+
         if ($form->isSubmitted()) {
             if($req->request->get('update') && $form->isValid()){
+            $userInfo->setPicturePath($picturePath);
             $this->em->persist($userInfo);
             $this->em->flush();
             return $this->redirectToRoute('welcomePage');
