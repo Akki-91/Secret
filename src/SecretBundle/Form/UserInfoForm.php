@@ -59,12 +59,12 @@ class UserInfoForm extends AbstractType
             $userInfo = $event->getData();
             $form = $event->getForm();
 
-            if (!$userInfo || null === $userInfo->getId()) {
+//            if (!$userInfo || null === $userInfo->getId()) {
                 $form->add('userExperienceRelation', CollectionType::class, array(
                     'entry_type' => UserExperienceForm::class,
                     'entry_options' => array('label' => 'Doświadczenie:'),
                 ));
-            }
+//            }
         });
 
     }

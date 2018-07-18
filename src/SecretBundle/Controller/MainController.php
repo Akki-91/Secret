@@ -204,19 +204,19 @@ class MainController extends Controller
         $repo = $this->em->getRepository(UserInfo::class);
         $userInfo = $repo->find($id);
         $userExp = $this->userExperience;
-        $picturePreviewPath = $userInfo->getPicturePath();
+        $oldPicturePath = $userInfo->getPicturePath();
 
         $userPicturePath = $this->getParameter('kernel.root_dir').'/../web/usersPictures/'.$userInfo->getPicturePath();
         $userInfo->setPicturePath(new File($userPicturePath));
         $userInfo->getUserExperienceRelation()->add($userExp);
 
         $form = $this->createForm(UserInfoForm::class, $userInfo,[
-            'action' => $this->generateUrl('saveEditedUser',['id' => $id, 'picturePath' => $picturePreviewPath]),
+            'action' => $this->generateUrl('saveEditedUser',['id' => $id, 'oldPicturePath' => $oldPicturePath]),
             'mappingOn' => false,
         ]);
 
         return [
-            'userPicturePath' => $picturePreviewPath,
+            'userPicturePath' => $oldPicturePath,
             'form' => $form->createView()
         ];
     }
@@ -227,23 +227,27 @@ class MainController extends Controller
      */
     public function saveEditedUserAction(Request $req, int $id)
     {
-        //Trzeba wziac pod uwage, ze moze chciec zmienic zdjecie, wiec tylko gdy jest puste zostawić stare.
         $repo = $this->em->getRepository(UserInfo::class);
         $userInfo = $repo->find($id);
-        $picturePath = $req->query->get('picturePath');
-
-        $userPicturePath = $this->getParameter('kernel.root_dir').'/../web/usersPictures/'. $picturePath;
+        $oldPicturePath = $req->query->get('oldPicturePath');
+        $userPicturePath = $this->getParameter('kernel.root_dir').'/../web/usersPictures/'. $oldPicturePath;
         $userInfo->setPicturePath(new File($userPicturePath));
 
         $form = $this->createForm(UserInfoForm::class, $userInfo);
-
         $form->handleRequest($req);
-
-        $data = $form->getData();
 
         if ($form->isSubmitted()) {
             if($req->request->get('update') && $form->isValid()){
-            $userInfo->setPicturePath($picturePath);
+                if($userInfo->getPicturePath() === null){
+                    $userInfo->setPicturePath($oldPicturePath);
+                } else {
+                    $file = $userInfo->getPicturePath();
+                    $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
+                    $directory = $this->container->getParameter('kernel.root_dir') . '/../web/usersPictures';
+                    $file->move($directory ,$fileName);
+                    $userInfo->setPicturePath($fileName);
+                }
+
             $this->em->persist($userInfo);
             $this->em->flush();
             return $this->redirectToRoute('welcomePage');
