@@ -1,7 +1,7 @@
 {% extends "@Secret/SecretView/bootstrap.html.twig" %}
 
 {% block body %}
-    {{ dump() }}
+    {#{{ dump() }}#}
     {{ form_start(form) }}
     <div>
         {{ form_label(form.name) }}
@@ -25,8 +25,18 @@
     </div>
     <img src="{{ asset('usersPictures/' ~ userPicturePath) }}" alt="alt" width="400px" height="400px" />
     <div>
-        {#{{ form_widget(form.userExperienceRelation) }}#}
+        {{ form_widget(form.userExperienceRelation) }}
     </div>
+    {#<div>#}
+        {#{% for row in form.userExperienceRelation %}#}
+            {#{% if loop.first %}#}
+                {#{{ dump(row) }}#}
+                {#{{ form_row(row.belt) }}#}
+                {#{{ form_row(row.stripes) }}#}
+            {#{% endif %}#}
+            {#{{ dump(row) }}#}
+        {#{% endfor %}#}
+    {#</div>#}
     <div>
 
         <button name='update' type='submit' value='update' class='btn btn-default'>Zaktualizuj dane użytkownika</button>

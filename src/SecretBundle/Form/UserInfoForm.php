@@ -55,17 +55,19 @@ class UserInfoForm extends AbstractType
                 'label' => 'Karnet opłacony do:',
             ]);
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $userInfo = $event->getData();
-            $form = $event->getForm();
+        $builder->add('userExperienceRelation',UserExperienceForm::class);
 
-//            if (!$userInfo || null === $userInfo->getId()) {
-                $form->add('userExperienceRelation', CollectionType::class, array(
-                    'entry_type' => UserExperienceForm::class,
-                    'entry_options' => array('label' => 'Doświadczenie:'),
-                ));
-//            }
-        });
+//        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+//            $userInfo = $event->getData();
+//            $form = $event->getForm();
+//
+////            if (!$userInfo || null === $userInfo->getId()) {
+//                $form->add('userExperienceRelation', CollectionType::class, array(
+//                    'entry_type' => UserExperienceForm::class,
+//                    'entry_options' => array('label' => 'Doświadczenie:'),
+//                ));
+////            }
+//        });
 
     }
 
@@ -73,6 +75,7 @@ class UserInfoForm extends AbstractType
     {
         $resolver->setDefaults([
             'mappingOn' => true,
+            'validation_groups' => ['UserInfo'],
         ]);
 
         $resolver->setAllowedTypes('mappingOn', 'boolean');

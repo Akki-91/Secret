@@ -15,7 +15,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="SecretBundle\Repository\UserInfoRepository")
  * @UniqueEntity(
  *     "clubCardNumber",
- *      message="Numer karty już istnieje w systemie."
+ *      message="Numer karty już istnieje w systemie.",
+ *      groups={"UserInfo"}
  * )
  */
 class UserInfo
@@ -83,7 +84,7 @@ class UserInfo
     private $userPresenceRelation;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserExperience", mappedBy="experience")
+     * @ORM\OneToOne(targetEntity="UserExperience", mappedBy="experience", cascade={"persist", "merge"})
      * @Assert\Valid()
      */
     private $userExperienceRelation;
@@ -97,7 +98,6 @@ class UserInfo
 
     public function __construct() {
         $this->userPresenceRelation = new ArrayCollection();
-        $this->userExperienceRelation = new ArrayCollection();
     }
 
     /**
@@ -288,41 +288,7 @@ class UserInfo
     {
         return $this->paymentAmmount;
     }
-
-    /**
-     * Add userExperienceRelation
-     *
-     * @param \SecretBundle\Entity\UserExperience $userExperienceRelation
-     *
-     * @return UserInfo
-     */
-    public function addUserExperienceRelation(\SecretBundle\Entity\UserExperience $userExperienceRelation)
-    {
-        $this->userExperienceRelation[] = $userExperienceRelation;
-
-        return $this;
-    }
-
-    /**
-     * Remove userExperienceRelation
-     *
-     * @param \SecretBundle\Entity\UserExperience $userExperienceRelation
-     */
-    public function removeUserExperienceRelation(\SecretBundle\Entity\UserExperience $userExperienceRelation)
-    {
-        $this->userExperienceRelation->removeElement($userExperienceRelation);
-    }
-
-    /**
-     * Get userExperienceRelation
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUserExperienceRelation()
-    {
-        return $this->userExperienceRelation;
-    }
-
+    
     /**
      * Set picturePath
      *
@@ -345,5 +311,29 @@ class UserInfo
     public function getPicturePath()
     {
         return $this->picturePath;
+    }
+
+    /**
+     * Set userExperienceRelation
+     *
+     * @param \SecretBundle\Entity\UserExperience $userExperienceRelation
+     *
+     * @return UserInfo
+     */
+    public function setUserExperienceRelation(\SecretBundle\Entity\UserExperience $userExperienceRelation = null)
+    {
+        $this->userExperienceRelation = $userExperienceRelation;
+
+        return $this;
+    }
+
+    /**
+     * Get userExperienceRelation
+     *
+     * @return \SecretBundle\Entity\UserExperience
+     */
+    public function getUserExperienceRelation()
+    {
+        return $this->userExperienceRelation;
     }
 }

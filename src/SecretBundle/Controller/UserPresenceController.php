@@ -3,6 +3,8 @@
 namespace SecretBundle\Controller;
 
 
+use SecretBundle\Form\CartForm;
+use SecretBundle\Form\ProductForm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -11,25 +13,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-
 use SecretBundle\Entity\UserInfo;
 use SecretBundle\Entity\UserExperience;
 use SecretBundle\Entity\UserPresence;
+
+use SecretBundle\Entity\Product;
+use SecretBundle\Entity\Cart;
 
 use SecretBundle\Form\UserInfoForm;
 use SecretBundle\Form\CheckPresenceForm;
 use SecretBundle\Form\AllUsersListForm;
 
 use SecretBundle\Service\PaginationService;
-
-
-use SecretBundle\Entity\Tag;
-use SecretBundle\Entity\Task;
-use SecretBundle\Form\TaskType;
 
 
 class UserPresenceController extends Controller
@@ -207,19 +202,95 @@ class UserPresenceController extends Controller
     }
 
     /**
-     * @Route("/addSomeStuff", name="addSomeStuff")
-     * @Template("@Secret/SecretView/addSomeStuff.html.twig")
+     * @Route("/addSomeStuff5", name="cartFFF")
+     * @Template("@Secret/SecretView/addSomeStuff5.html.twig")
      */
-    public function addSomeStuffAction(Request $request)
+    public function cartAction ()
     {
-        $repo = $this->em->getRepository(UserInfo::class);
-        $user = $repo->find(106);
+        $cart = new Cart();
+        $product = new Product();
+        $cart->setProduct($product);
 
-        $photo = $user->getPicturePath();
+        $form = $this->createForm(CartForm::class, $cart,[
+            'action' => $this->generateUrl('cartFFF2')
+        ]);
 
         return [
-            'photo' => $photo,
+            'form' => $form->createView()
         ];
+    }
+
+    /**
+     * @Route("/addSomeStuff6", name="cartFFF2")
+     * @param Request $req
+     * @return Response
+     */
+    public function cart2Action (Request $req)
+    {
+        $cart = new Cart();
+        $product = new Product();
+        $cart->setProduct($product);
+
+        $form = $this->createForm(CartForm::class,$cart);
+        $form->handleRequest($req);
+
+        if ($form->isSubmitted()) {
+            var_dump('isSub');
+            if ($req->request->get('kartofel') && $form->isValid()) {
+                var_dump('isValid');
+
+                $product->setCart($cart);
+
+                $this->em->persist($product);
+                $this->em->persist($cart);
+                $this->em->flush();
+                return new Response ('fuck off');
+            }
+        }
+    }
+
+    /**
+     * @Route("/addSomeStuff7", name="editCart")
+     * @Template("@Secret/SecretView/addSomeStuff7.html.twig")
+     */
+    public function editCartAction (Request $req)
+    {
+        $repo = $this->em->getRepository(Cart::class);
+        $cart = $repo->find(27);
+        var_dump($cart);
+
+        $form = $this->createForm(CartForm::class, $cart,[
+            'action' => $this->generateUrl('cartEditSave', ['id' => 27])
+        ]);
+
+        return [
+            'form' => $form->createView()
+        ];
+    }
+
+    /**
+     * @Route("/addSomeStuff8/{id}", name="cartEditSave")
+     */
+    public function editCartSaveAction (Request $req, $id)
+    {
+        $repo = $this->em->getRepository(Cart::class);
+        $cart = $repo->find($id);
+
+        $product = $cart->getProduct();
+        $cart->setProduct($product);
+
+        $form = $this->createForm(CartForm::class, $cart);
+        $form->handleRequest($req);
+
+        if ($form->isSubmitted()) {
+            if ($req->request->get('kartofel') && $form->isValid()) {
+                $product->setCart($cart);
+
+                $this->em->persist($product);
+                $this->em->persist($cart);
+                $this->em->flush();
+            }
+        }
     }
 }
 

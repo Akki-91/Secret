@@ -2,30 +2,24 @@
 
 namespace SecretBundle\Controller;
 
-use SecretBundle\SecretBundle;
+use Doctrine\ORM\EntityManagerInterface;
+use SecretBundle\Entity\UserExperience;
+use SecretBundle\Entity\UserInfo;
+
+use SecretBundle\Form\AllUsersListForm;
+use SecretBundle\Form\UserInfoForm;
+
+use SecretBundle\Interfaces\CreateUserServiceInterface;
+use SecretBundle\Interfaces\ClubCardNumberUniquenessServiceInterface;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\File\File;
-
-use SecretBundle\Service\ClubCardNumberUniquenessService;
-
-use SecretBundle\Entity\UserInfo;
-use SecretBundle\Entity\UserExperience;
-
-use SecretBundle\Form\UserInfoForm;
-use SecretBundle\Form\AllUsersListForm;
-
 
 
 class MainController extends Controller
@@ -47,47 +41,23 @@ class MainController extends Controller
     private $clubCardNumberUniquenessService;
 
     /**
+     * @var createUserServiceInterface
+     */
+    private $createUserServiceInterface;
+
+    /**
      * @var EntityManagerInterface
      */
     private $em;
 
-    public function __construct(UserInfo $userInfo, EntityManagerInterface $entityManager, UserExperience $userExperience, ClubCardNumberUniquenessService $clubCardNumberUniquenessService)
+    public function __construct(UserInfo $userInfo, EntityManagerInterface $entityManager, UserExperience $userExperience, ClubCardNumberUniquenessServiceInterface $clubCardNumberUniquenessService, CreateUserServiceInterface $createUserService)
     {
         $this->userInfo = $userInfo;
         $this->userExperience = $userExperience;
         $this->em = $entityManager;
         $this->clubCardNumberUniquenessService = $clubCardNumberUniquenessService;
+        $this->createUserServiceInterface = $createUserService;
     }
-
-    /**
-     * @return string
-     */
-    private function generateUniqueFileName()
-    {
-        return md5(uniqid());
-    }
-
-    /**
-     * @return integer
-     */
-    private function countEntries($paymentAmmount)
-    {
-        switch($paymentAmmount){
-            case 0:
-                return 4;
-                break;
-            case 1:
-                return 8;
-                break;
-            case 2:
-                return 12;
-                break;
-            default:
-                return 0;
-        }
-    }
-
-
 
     /**
      * @Route("/", name="welcomePage")
@@ -102,22 +72,10 @@ class MainController extends Controller
      */
     public function checkClubCardNumber(Request $request)
     {
-//        if ($request->isXmlHttpRequest()) {
-//            $clubCardNumber = $request->query->get('clubCardNumber');
-//            $cardNumberExists = $this->clubCardNumberUniquenessService->checkUniqueness($clubCardNumber);
-//            return new JsonResponse(array('cardNumberExists' => true));
-//        }
-
         if ($request->isXmlHttpRequest()) {
             $clubCardNumber = $request->query->get('clubCardNumber');
-            $repo = $this->em->getRepository(UserInfo::class);
-            $cardNumberExists = $repo->findOneByClubCardNumber($clubCardNumber);
-
-            if($cardNumberExists instanceof UserInfo){
-                return new JsonResponse(array('cardNumberExists' => true));
-            }
-
-            return new JsonResponse(array('cardNumberExists' => false));
+            $cardNumberExists = $this->clubCardNumberUniquenessService->checkUniqueness($clubCardNumber);
+            return new JsonResponse(['cardNumberExists' => $cardNumberExists]);
         }
     }
 
@@ -128,14 +86,7 @@ class MainController extends Controller
      */
     public function addUserFormAction()
     {
-        $userInfo = $this->userInfo;
-        $userExp = $this->userExperience;
-
-        $userInfo->getUserExperienceRelation()->add($userExp);
-
-        $form = $this->createForm(UserInfoForm::class, $userInfo,[
-           'action' => $this->generateUrl('createUser')
-        ]);
+        $form = $this->createUserServiceInterface->userInfoForm(['route' => 'createUser']);
 
         return [
             'form' => $form->createView()
@@ -145,52 +96,23 @@ class MainController extends Controller
     /**
      * @Route("/createUser", name="createUser")
      * @Method("POST")
+     * @param Request $req
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function createAction(Request $req)
     {
-        $date = new \DateTime("now");
-        $userInfo = $this->userInfo;
-        $userExp = $this->userExperience;
-
-        $userInfo->getUserExperienceRelation()->add($userExp);
-
-        $form = $this->createForm(UserInfoForm::class,$userInfo);
+        $form = $this->createUserServiceInterface->userInfoForm();
 
         $form->handleRequest($req);
         if ($form->isSubmitted()){
             if($req->request->get('create') && $form->isValid()){
-                $file = $userInfo->getPicturePath();
-                $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
-                $directory = $this->container->getParameter('kernel.root_dir') . '/../web/usersPictures';
-                $file->move($directory ,$fileName);
-
-                $userInfo->setPicturePath($fileName);
-                $userInfo->setTotalTrainingCount(0);
-                $userInfo->setEntriesLeft($this->countEntries($userInfo->getPaymentAmmount()));
-
-                $userExp->setPromotionDate($date);
-                $userExp->setTrainingsCountOnPromotionDay(0);
-                $userExp->setExperience($userInfo);
-
-                $this->em->persist($userInfo);
-                $this->em->persist($userExp);
-                $this->em->flush();
-
-                $this->addFlash('userAdded', "Użytkownik " . $userInfo->getName(). " został pomyślnie zarejestrowany." );
-                return $this->redirectToRoute('addUserForm');
-
+                $data = $form->getData();
+                $this->createUserServiceInterface->createUser($data);
             } else {
-                $errorMessages = [];
-                foreach ($form->getErrors(true) as $key => $error) {
-                    $errorMessages[] = ['key' => $key, 'msg' => $error->getMessage()];
-                }
-
-                if(count($errorMessages) > 0){
-                    $this->addFlash('errorMessages', $errorMessages );
-                }
-
-                return $this->redirectToRoute('addUserForm');
+                $this->createUserServiceInterface->addUserErrorsHandler($form->getErrors(true));
             }
+
+        return $this->redirectToRoute('addUserForm');
         }
     }
 
@@ -198,75 +120,52 @@ class MainController extends Controller
      * @Route("/editUserForm/{id}", name="editUserForm", defaults={"id"="0"} )
      * @Method("GET")
      * @Template("@Secret/SecretView/editUserForm.html.twig")
+     * @param Request $req
+     * @param int $id
+     * @return array
      */
-    public function editUserFormAction(Request $req, int $id)
+    public function editUserFormAction(Request $req, int $id): array
     {
-        $repo = $this->em->getRepository(UserInfo::class);
-        $userInfo = $repo->find($id);
-        $userExp = $this->userExperience;
-        $oldPicturePath = $userInfo->getPicturePath();
-
-        $userPicturePath = $this->getParameter('kernel.root_dir').'/../web/usersPictures/'.$userInfo->getPicturePath();
-        $userInfo->setPicturePath(new File($userPicturePath));
-        $userInfo->getUserExperienceRelation()->add($userExp);
-
-        $form = $this->createForm(UserInfoForm::class, $userInfo,[
-            'action' => $this->generateUrl('saveEditedUser',['id' => $id, 'oldPicturePath' => $oldPicturePath]),
-            'mappingOn' => false,
-        ]);
+        $form = $this->createUserServiceInterface->editUserForm(['route' => 'saveEditedUser'],$id);
 
         return [
-            'userPicturePath' => $oldPicturePath,
-            'form' => $form->createView()
+            'userPicturePath' => $form['oldPicturePath'],
+            'form' => $form['form']->createView()
         ];
     }
 
     /**
      * @Route("/saveEditedUser/{id}", name="saveEditedUser", defaults={"id"="0"})
      * @Method("POST")
+     * @param Request $req
+     * @param int $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function saveEditedUserAction(Request $req, int $id)
+    public function saveEditedUserAction(Request $req, int $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $repo = $this->em->getRepository(UserInfo::class);
-        $userInfo = $repo->find($id);
         $oldPicturePath = $req->query->get('oldPicturePath');
-        $userPicturePath = $this->getParameter('kernel.root_dir').'/../web/usersPictures/'. $oldPicturePath;
-        $userInfo->setPicturePath(new File($userPicturePath));
-
-        $form = $this->createForm(UserInfoForm::class, $userInfo);
+        $form =  $form = $this->createUserServiceInterface->saveEditedUserForm([], $id, $oldPicturePath);
         $form->handleRequest($req);
 
         if ($form->isSubmitted()) {
             if($req->request->get('update') && $form->isValid()){
-                if($userInfo->getPicturePath() === null){
-                    $userInfo->setPicturePath($oldPicturePath);
-                } else {
-                    $file = $userInfo->getPicturePath();
-                    $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
-                    $directory = $this->container->getParameter('kernel.root_dir') . '/../web/usersPictures';
-                    $file->move($directory ,$fileName);
-                    $userInfo->setPicturePath($fileName);
-                }
+                $data = $form->getData();
+                $this->createUserServiceInterface->setEditedPicturePath($data, $oldPicturePath);
 
-            $this->em->persist($userInfo);
-            $this->em->flush();
-            return $this->redirectToRoute('welcomePage');
+                return $this->redirectToRoute('welcomePage');
             }
         }
-
     }
 
     /**
      * @Route("/showAllUsers", name="showAllUsers")
      * @Template("@Secret/SecretView/showAllUsers.html.twig")
      * @Method("GET")
+     * @return array
      */
-    public function showAllAction(Request $req)
+    public function showAllAction(): array
     {
-        $user = $this->userInfo;
-        $form = $this->createForm(AllUsersListForm::class, $user, [
-            'action' => $this->generateUrl('updateUser')
-        ]);
+        $form = $this->createUserServiceInterface->allUsersListForm(['route' => 'updateUser']);
 
         return [
             'form' => $form->createView()
@@ -276,16 +175,16 @@ class MainController extends Controller
     /**
      * @Route("/updateUser", name="updateUser")
      * @Method("POST")
+     * @param Request $req
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function updateUserAction(Request $req)
+    public function updateUserAction(Request $req): \Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $user = $this->userInfo;
-        $form = $this->createForm(AllUsersListForm::class, $user);
-
+        $form = $this->createUserServiceInterface->allUsersListForm();
         $form->handleRequest($req);
 
         if ($form->isSubmitted()) {
-            $id = $user->getName()->getId();
+            $id = $form->getData()->getName()->getId();
             return $this->redirectToRoute('editUserForm',["id" => $id]);
         }
     }

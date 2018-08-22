@@ -3,6 +3,7 @@
 namespace SecretBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * UserExperience
@@ -23,14 +24,12 @@ class UserExperience
 
     /**
      * @var int
-     *
      * @ORM\Column(name="belt", type="integer")
      */
     private $belt;
 
     /**
      * @var int
-     *
      * @ORM\Column(name="stripes", type="integer")
      */
     private $stripes;
@@ -50,7 +49,7 @@ class UserExperience
     private $trainingsCountOnPromotionDay;
 
     /**
-     * @ORM\ManyToOne(targetEntity="UserInfo", inversedBy="userExperienceRelation")
+     * @ORM\OneToOne(targetEntity="UserInfo", inversedBy="userExperienceRelation")
      * @ORM\JoinColumn(name="userInfoIdInExp", referencedColumnName="id")
      */
     private $experience;
@@ -162,27 +161,4 @@ class UserExperience
         return $this->trainingsCountOnPromotionDay;
     }
 
-    /**
-     * Set experience
-     *
-     * @param \SecretBundle\Entity\UserInfo $experience
-     *
-     * @return UserExperience
-     */
-    public function setExperience(\SecretBundle\Entity\UserInfo $experience = null)
-    {
-        $this->experience = $experience;
-
-        return $this;
-    }
-
-    /**
-     * Get experience
-     *
-     * @return \SecretBundle\Entity\UserInfo
-     */
-    public function getExperience()
-    {
-        return $this->experience;
-    }
 }

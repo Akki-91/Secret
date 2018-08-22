@@ -49,7 +49,7 @@ class UserExperience
     private $trainingsCountOnPromotionDay;
 
     /**
-     * @ORM\ManyToOne(targetEntity="UserInfo", inversedBy="userExperienceRelation")
+     * @ORM\OneToOne(targetEntity="UserInfo", inversedBy="userExperienceRelation")
      * @ORM\JoinColumn(name="userInfoIdInExp", referencedColumnName="id")
      */
     private $experience;
@@ -160,6 +160,7 @@ class UserExperience
     {
         return $this->trainingsCountOnPromotionDay;
     }
+
 
     /**
      * Set experience

@@ -2,23 +2,25 @@
 /**
  * Created by PhpStorm.
  * User: Akki
- * Date: 27.06.2018
- * Time: 16:57
+ * Date: 18.07.2018
+ * Time: 23:37
  */
 
 namespace SecretBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 
-class CheckPresenceForm extends AbstractType
+class CartForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('clubCardNumber',TextType::class,[
-                'label' => 'Numer karty klubowej:'
+            ->add('cartName', TextType::class,[
+                'label' => "Nazwa koszyka:",
             ]);
+
+        $builder->add('product',ProductForm::class);
     }
 }

@@ -6,12 +6,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * UserInfo
  *
  * @ORM\Table(name="user_info")
  * @ORM\Entity(repositoryClass="SecretBundle\Repository\UserInfoRepository")
+ * @UniqueEntity(
+ *     "clubCardNumber",
+ *      message="Numer karty już istnieje w systemie."
+ * )
  */
 class UserInfo
 {
@@ -26,8 +31,13 @@ class UserInfo
 
     /**
      * @var int
+     * @Assert\Length(
+     *     min=6,
+     *     max=6,
+     *     exactMessage = "Numer karty musi składać się z {{ limit }} cyfr",
+     * )
      *
-     * @ORM\Column(name="clubCardNumber", type="integer")
+     * @ORM\Column(name="clubCardNumber", type="integer", unique=true)
      */
     private $clubCardNumber;
 
@@ -68,11 +78,13 @@ class UserInfo
 
     /**
      * @ORM\OneToMany(targetEntity="UserPresence", mappedBy="presence")
+     * @Assert\Valid()
      */
     private $userPresenceRelation;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserExperience", mappedBy="experience")
+     * @ORM\OneToOne(targetEntity="UserExperience", mappedBy="experience")
+     * @Assert\Valid()
      */
     private $userExperienceRelation;
 
@@ -85,7 +97,6 @@ class UserInfo
 
     public function __construct() {
         $this->userPresenceRelation = new ArrayCollection();
-        $this->userExperienceRelation = new ArrayCollection();
     }
 
     /**
@@ -276,41 +287,7 @@ class UserInfo
     {
         return $this->paymentAmmount;
     }
-
-    /**
-     * Add userExperienceRelation
-     *
-     * @param \SecretBundle\Entity\UserExperience $userExperienceRelation
-     *
-     * @return UserInfo
-     */
-    public function addUserExperienceRelation(\SecretBundle\Entity\UserExperience $userExperienceRelation)
-    {
-        $this->userExperienceRelation[] = $userExperienceRelation;
-
-        return $this;
-    }
-
-    /**
-     * Remove userExperienceRelation
-     *
-     * @param \SecretBundle\Entity\UserExperience $userExperienceRelation
-     */
-    public function removeUserExperienceRelation(\SecretBundle\Entity\UserExperience $userExperienceRelation)
-    {
-        $this->userExperienceRelation->removeElement($userExperienceRelation);
-    }
-
-    /**
-     * Get userExperienceRelation
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUserExperienceRelation()
-    {
-        return $this->userExperienceRelation;
-    }
-
+    
     /**
      * Set picturePath
      *

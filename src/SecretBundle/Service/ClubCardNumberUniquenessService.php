@@ -8,9 +8,9 @@
 
 namespace SecretBundle\Service;
 use Doctrine\ORM\EntityManagerInterface;
-use SecretBundle\Entity\UserInfo;
+use SecretBundle\Interfaces\ClubCardNumberUniquenessServiceInterface;
 
-class ClubCardNumberUniquenessService
+class ClubCardNumberUniquenessService implements ClubCardNumberUniquenessServiceInterface
 {
     /**
      * @var EntityManagerInterface
@@ -26,20 +26,15 @@ class ClubCardNumberUniquenessService
         $this->entityManager = $entityManager;
     }
 
-//    public function checkUniqueness(int $clubCardNumber)
-//    {
-//        $repo = $this->entityManager->getRepository(UserInfo::class);
-//        $cardNumberExists = $repo->findByClubCardNumber($clubCardNumber);
-//
-//        //wyskakuje mi z AJAX'a przez ten return. Nie wiem jak przekazac dane do kontrolki...
-//        if(empty($cardNumberExists) === true ){
-//            var_dump('null');
-//             json_encode(false);
-//             return false;
-//            return new JsonResponse(array('cardNumberExists' => false));
-//        } else {
-//            var_dump(' not null');
-//             json_encode(true);
-//        }
-//    }
+    public function checkUniqueness(int $clubCardNumber)
+    {
+        $repo = $this->entityManager->getRepository(UserInfo::class);
+        $cardNumberExists = $repo->findByClubCardNumber($clubCardNumber);
+
+        if(empty($cardNumberExists) === true ){
+             return false;
+        } else {
+            return true;
+        }
+    }
 }
