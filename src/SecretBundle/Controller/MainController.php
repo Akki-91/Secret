@@ -1,22 +1,11 @@
 <?php
 
 namespace SecretBundle\Controller;
-
-use Doctrine\ORM\EntityManagerInterface;
-use SecretBundle\Entity\UserExperience;
-use SecretBundle\Entity\UserInfo;
-
-use SecretBundle\Form\AllUsersListForm;
-use SecretBundle\Form\UserInfoForm;
-
 use SecretBundle\Interfaces\CreateUserServiceInterface;
 use SecretBundle\Interfaces\ClubCardNumberUniquenessServiceInterface;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -24,17 +13,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 class MainController extends Controller
 {
-
-    /**
-     * @var userInfo
-     */
-    private $userInfo;
-
-    /**
-     * @var userExperience
-     */
-    private $userExperience;
-
     /**
      * @var clubCardNumberUniquenessService
      */
@@ -45,16 +23,8 @@ class MainController extends Controller
      */
     private $createUserServiceInterface;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    public function __construct(UserInfo $userInfo, EntityManagerInterface $entityManager, UserExperience $userExperience, ClubCardNumberUniquenessServiceInterface $clubCardNumberUniquenessService, CreateUserServiceInterface $createUserService)
+    public function __construct(ClubCardNumberUniquenessServiceInterface $clubCardNumberUniquenessService, CreateUserServiceInterface $createUserService)
     {
-        $this->userInfo = $userInfo;
-        $this->userExperience = $userExperience;
-        $this->em = $entityManager;
         $this->clubCardNumberUniquenessService = $clubCardNumberUniquenessService;
         $this->createUserServiceInterface = $createUserService;
     }
